@@ -158,7 +158,53 @@ import IconEstrella from '~/components/icons/IconEstrella.vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement)
 
-const { data } = await useFetch('/api/dashboard')
+const supabase = useSupabaseClient()
+
+const { data } = await useAsyncData('dashboard', async () => {
+  const [
+    { data: statsData },
+    { data: porSaborData },
+    { data: recientesData }
+  ] = await Promise.all([
+    supabase.from('vista_dashboard').select('*').single(),
+    supabase.from('ventas_por_sabor').select('*'),
+    supabase.from('ventas')
+      .select('id_venta, codigo_orden, cantidad, total_recaudado, fecha_venta, id_sabor')
+      .order('fecha_venta', { ascending: false })
+      .limit(10)
+  ])
+  
+  // Para las recientes, necesitamos cruzar con sabores si es que no usamos un join
+  // Haremos la consulta de sabores manualmente por si no existe foreign key en postgrest
+  let recientes = []
+  if (recientesData && recientesData.length > 0) {
+    const ids = [...new Set(recientesData.map(r => r.id_sabor))]
+    const { data: saboresData } = await supabase
+      .from('sabores')
+      .select('id_sabor, nombre_sabor')
+      .in('id_sabor', ids)
+      
+    const saboresMap = {}
+    if (saboresData) {
+      saboresData.forEach(s => { saboresMap[s.id_sabor] = s.nombre_sabor })
+    }
+    
+    recientes = recientesData.map(v => ({
+      id_venta: v.id_venta,
+      codigo_orden: v.codigo_orden,
+      cantidad: v.cantidad,
+      total_recaudado: v.total_recaudado,
+      fecha_venta: v.fecha_venta,
+      nombre_sabor: saboresMap[v.id_sabor] || 'Desconocido'
+    }))
+  }
+
+  return {
+    stats: statsData,
+    porSabor: porSaborData,
+    recientes: recientes
+  }
+})
 
 const chartKey = computed(() => {
   if (!data.value?.porSabor) return 'empty'

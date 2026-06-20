@@ -123,6 +123,7 @@
 </template>
 
 <script setup>
+const supabase = useSupabaseClient()
 const sabores = ref([])
 const cargando = ref(false)
 const exito = ref(null)
@@ -133,7 +134,14 @@ const form = reactive({
 
 onMounted(async () => {
   try {
-    sabores.value = await $fetch('/api/sabores')
+    const { data, error } = await supabase
+      .from('sabores')
+      .select('id_sabor, nombre_sabor, categoria, precio_unitario')
+      .eq('activo', true)
+      .order('nombre_sabor')
+      
+    if (error) throw error
+    sabores.value = data
   } catch (err) {
     alert('Error al cargar sabores. Recarga la página.')
   }
@@ -155,15 +163,22 @@ const registrarVenta = async () => {
   exito.value = null
   
   try {
-    const resultado = await $fetch('/api/ventas', {
-      method: 'POST',
-      body: {
+    const sabor = sabores.value.find(s => String(s.id_sabor) === form.id_sabor)
+    const total = sabor.precio_unitario * form.cantidad
+
+    const { data: venta, error } = await supabase
+      .from('ventas')
+      .insert({
         id_sabor: parseInt(form.id_sabor),
-        cantidad: parseInt(form.cantidad)
-      }
-    })
+        cantidad: parseInt(form.cantidad),
+        total_recaudado: total
+      })
+      .select()
+      .single()
+      
+    if (error) throw error
     
-    exito.value = resultado.venta
+    exito.value = venta
     form.id_sabor = ''
     form.cantidad = 1
     

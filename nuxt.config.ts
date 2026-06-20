@@ -1,6 +1,12 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/supabase'
+  ],
+  supabase: {
+    redirect: false
+  },
   css: ['~/assets/css/main.css'],
   ssr: false,
   nitro: {
