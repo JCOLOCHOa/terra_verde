@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-hueso text-texto font-sans;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Georgia', 'Cambria', serif;
+  }
+}
+
+@layer components {
+  .btn-principal {
+    @apply bg-dorado text-white px-6 py-3 rounded-lg font-semibold
+    transition-all duration-300 hover:bg-dorado-light
+    hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+  }
+  
+  .btn-secundario {
+    @apply bg-verde text-white px-6 py-3 rounded-lg font-semibold
+    transition-all duration-300 hover:bg-verde-light
+    hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+  }
+  
+  .card-terra {
+    @apply bg-hueso border border-card-border rounded-xl p-6
+    shadow-sm transition-all duration-300;
+  }
+  
+  .card-terra:hover {
+    @apply shadow-md border-dorado/30;
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5EBDD;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B88A34;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8A6A24;
+}
+
+/* Transiciones de página */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s ease;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
