@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   },
   // IMPORTANTE: Ruta base para GitHub Pages
   app: {
-    baseURL: '/terraverde/'
+    baseURL: '/terra_verde/'
   },
   compatibilityDate: '2026-06-18'
 })
